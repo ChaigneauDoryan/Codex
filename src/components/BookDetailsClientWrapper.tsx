@@ -8,6 +8,16 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; // Import Select components
 import { useToast } from '@/hooks/use-toast'; // Import useToast
 
+const READING_STATUSES = [
+  { name: 'to_read', label: 'À lire', bgColorClass: 'bg-primary' },
+  { name: 'reading', label: 'En cours', bgColorClass: 'bg-warning' },
+  { name: 'finished', label: 'Terminé', bgColorClass: 'bg-success' },
+];
+
+const getStatusDetails = (statusName: string) => {
+  return READING_STATUSES.find(s => s.name === statusName);
+};
+
 interface BookDetailsClientWrapperProps {
   userBookId: string;
   userBook: any;
@@ -76,17 +86,24 @@ export default function BookDetailsClientWrapper({ userBookId, userBook: initial
             />
           )}
           <div>
-            <p className="text-sm text-gray-600 mb-4">{userBook.book.description}</p>
+            <p className="text-sm text-muted-foreground mb-4">{userBook.book.description}</p>
             <div className="flex items-center space-x-2">
-              <p className="text-sm">Statut :</p>
+              <p className="text-sm flex items-center">
+                Statut : <span className={`w-2 h-2 rounded-full ml-2 ${getStatusDetails(userBook.status_id === 1 ? 'to_read' : userBook.status_id === 2 ? 'reading' : 'finished')?.bgColorClass}`}></span>
+              </p>
               <Select onValueChange={handleStatusChange} defaultValue={userBook.status_id === 1 ? 'to_read' : userBook.status_id === 2 ? 'reading' : 'finished'}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="to_read">À lire</SelectItem>
-                  <SelectItem value="reading">En cours</SelectItem>
-                  <SelectItem value="finished">Terminé</SelectItem>
+                  {READING_STATUSES.map((status) => (
+                    <SelectItem key={status.name} value={status.name}>
+                      <div className="flex items-center">
+                        <span className={`w-2 h-2 rounded-full mr-2 ${status.bgColorClass}`}></span>
+                        {status.label}
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

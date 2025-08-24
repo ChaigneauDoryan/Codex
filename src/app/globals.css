@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 210 100% 50%; /* Vibrant blue for light mode */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -28,6 +28,11 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 142 76% 40%; /* A light mode green */
+    --success-foreground: 222.2 47.4% 11.2%; /* Dark text for light background */
+    --warning: 45 93% 50%; /* A light mode orange/yellow */
+    --warning-foreground: 222.2 47.4% 11.2%; /* Dark text for light background */
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
@@ -36,39 +41,228 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Arrière-plan principal légèrement moins sombre */
+    --background: 220 20% 8%;
+    --foreground: 220 15% 90%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    /* Cards avec un contraste amélioré */
+    --card: 220 20% 12%;
+    --card-foreground: 220 12% 88%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    /* Popovers avec un contraste amélioré */
+    --popover: 220 25% 10%;
+    --popover-foreground: 220 12% 90%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary moderne avec un bleu électrique (légèrement ajusté) */
+    --primary: 213 100% 60%;
+    --primary-foreground: 220 20% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary avec plus de contraste */
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 220 15% 80%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Muted plus visible et lisible */
+    --muted: 220 16% 16%;
+    --muted-foreground: 220 10% 78%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent avec un cyan moderne (légèrement ajusté) */
+    --accent: 180 100% 65%;
+    --accent-foreground: 220 20% 8%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive plus punch (légèrement ajusté) */
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 220 15% 90%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    /* Bordures plus visibles avec une teinte */
+    --border: 220 15% 28%;
+    --input: 220 18% 20%;
+    --ring: 213 100% 60%;
+
+    /* Nouvelles variables pour les succès/warning (foreground matching new background) */
+    --success: 142 76% 55%;
+    --success-foreground: 220 20% 8%;
+    --warning: 45 93% 65%;
+    --warning-foreground: 220 20% 8%;
   }
 }
 
 @layer base {
   body {
+    @apply transition-colors duration-500 ease-in-out;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Dégradé subtil pour l'arrière-plan en dark mode */
+  .dark body {
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(220 30% 4%) 100%);
+    min-height: 100vh;
+  }
+
+  /* Scrollbars élégantes */
+  .dark ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--accent)));
+    border-radius: 3px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, hsl(var(--accent)), hsl(var(--primary)));
+  }
+
+  /* Focus states avec glow effect */
+  .dark *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5), 0 0 10px hsl(var(--ring) / 0.3);
+    border-radius: 6px;
+  }
+
+  /* Sélection de texte avec gradient */
+  .dark ::selection {
+    background: linear-gradient(45deg, hsl(var(--primary) / 0.4), hsl(var(--accent) / 0.4));
+    color: hsl(var(--foreground));
+  }
+
+  /* Ombres avec glow subtil */
+  .dark .shadow-sm {
+    box-shadow: 0 1px 2px 0 hsl(var(--background) / 0.4), 0 0 4px 0 hsl(var(--primary) / 0.05);
+  }
+
+  .dark .shadow {
+    box-shadow: 0 1px 3px 0 hsl(var(--background) / 0.5), 0 1px 2px 0 hsl(var(--background) / 0.3), 0 0 8px 0 hsl(var(--primary) / 0.08);
+  }
+
+  .dark .shadow-md {
+    box-shadow: 0 4px 6px -1px hsl(var(--background) / 0.5), 0 2px 4px -1px hsl(var(--background) / 0.3), 0 0 12px 0 hsl(var(--primary) / 0.1);
+  }
+
+  .dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px hsl(var(--background) / 0.6), 0 4px 6px -2px hsl(var(--background) / 0.3), 0 0 20px 0 hsl(var(--primary) / 0.12);
+  }
+
+  .dark .shadow-xl {
+    box-shadow: 0 20px 25px -5px hsl(var(--background) / 0.7), 0 10px 10px -5px hsl(var(--background) / 0.4), 0 0 30px 0 hsl(var(--primary) / 0.15);
+  }
+}
+
+@layer components {
+  /* Card moderne avec bordure lumineuse */
+  .modern-card {
+    @apply bg-card text-card-foreground rounded-xl border border-border backdrop-blur-sm;
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+    box-shadow: 0 4px 6px -1px hsl(var(--background) / 0.1), 0 2px 4px -1px hsl(var(--background) / 0.06), inset 0 1px 0 0 hsl(var(--border) / 0.8);
+  }
+
+  .dark .modern-card {
+    border: 1px solid hsl(var(--border));
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(220 22% 9%) 100%);
+    box-shadow: 
+      0 4px 6px -1px hsl(var(--background) / 0.6), 
+      0 2px 4px -1px hsl(var(--background) / 0.4),
+      0 0 15px 0 hsl(var(--primary) / 0.08),
+      inset 0 1px 0 0 hsl(var(--border) / 0.4);
+  }
+
+  .modern-card:hover {
+    @apply scale-[1.02] transition-all duration-300 ease-out;
+  }
+
+  .dark .modern-card:hover {
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 
+      0 8px 25px -8px hsl(var(--background) / 0.7),
+      0 0 25px 0 hsl(var(--primary) / 0.15),
+      inset 0 1px 0 0 hsl(var(--primary) / 0.2);
+  }
+
+  /* Boutons avec style glassmorphism */
+  .glass-button {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-300 backdrop-blur-sm;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.8) 0%, hsl(var(--primary) / 0.9) 100%);
+    border: 1px solid hsl(var(--primary) / 0.3);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 4px 15px 0 hsl(var(--primary) / 0.2), inset 0 1px 0 0 hsl(var(--primary) / 0.4);
+  }
+
+  .glass-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 hsl(var(--primary) / 0.3), inset 0 1px 0 0 hsl(var(--primary) / 0.6);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.95) 100%);
+  }
+
+  .glass-button.success {
+    background: linear-gradient(135deg, hsl(var(--success) / 0.8) 0%, hsl(var(--success) / 0.9) 100%);
+    border-color: hsl(var(--success) / 0.3);
+    box-shadow: 0 4px 15px 0 hsl(var(--success) / 0.2), inset 0 1px 0 0 hsl(var(--success) / 0.4);
+  }
+
+  .glass-button.success:hover {
+    background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(var(--success) / 0.95) 100%);
+    box-shadow: 0 8px 25px 0 hsl(var(--success) / 0.3), inset 0 1px 0 0 hsl(var(--success) / 0.6);
+  }
+
+  .glass-button.danger {
+    background: linear-gradient(135deg, hsl(var(--destructive) / 0.8) 0%, hsl(var(--destructive) / 0.9) 100%);
+    border-color: hsl(var(--destructive) / 0.3);
+    box-shadow: 0 4px 15px 0 hsl(var(--destructive) / 0.2), inset 0 1px 0 0 hsl(var(--destructive) / 0.4);
+  }
+
+  .glass-button.danger:hover {
+    background: linear-gradient(135deg, hsl(var(--destructive)) 0%, hsl(var(--destructive) / 0.95) 100%);
+    box-shadow: 0 8px 25px 0 hsl(var(--destructive) / 0.3), inset 0 1px 0 0 hsl(var(--destructive) / 0.6);
+  }
+
+  /* Input moderne */
+  .modern-input {
+    @apply bg-input text-foreground border border-border rounded-lg px-4 py-3 transition-all duration-300;
+    background: linear-gradient(135deg, hsl(var(--input)) 0%, hsl(var(--muted)) 100%);
+  }
+
+  .dark .modern-input {
+    background: linear-gradient(135deg, hsl(var(--input)) 0%, hsl(220 25% 15%) 100%);
+    border: 1px solid hsl(var(--border));
+    box-shadow: inset 0 2px 4px 0 hsl(var(--background) / 0.3);
+  }
+
+  .modern-input:focus {
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.2), inset 0 2px 4px 0 hsl(var(--background) / 0.1);
+  }
+
+  .dark .modern-input:focus {
+    box-shadow: 
+      0 0 0 3px hsl(var(--ring) / 0.2), 
+      0 0 15px 0 hsl(var(--ring) / 0.1),
+      inset 0 2px 4px 0 hsl(var(--background) / 0.4);
+  }
+
+  /* Badge avec glow effect */
+  .glow-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    background: linear-gradient(135deg, hsl(var(--accent) / 0.15) 0%, hsl(var(--accent) / 0.25) 100%);
+    border: 1px solid hsl(var(--accent) / 0.3);
+    color: hsl(var(--accent));
+    box-shadow: 0 0 10px 0 hsl(var(--accent) / 0.2), inset 0 1px 0 0 hsl(var(--accent) / 0.1);
+  }
+
+  /* Section découverte avec style */
+  .discovery-section {
+    @apply rounded-2xl border-2 border-dashed border-border bg-muted/30 backdrop-blur-sm;
+  }
+
+  .dark .discovery-section {
+    background: linear-gradient(135deg, hsl(var(--muted) / 0.3) 0%, hsl(220 20% 8% / 0.5) 100%);
+    border-color: hsl(var(--border));
+    box-shadow: inset 0 0 20px 0 hsl(var(--primary) / 0.03);
   }
 }
