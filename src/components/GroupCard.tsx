@@ -163,8 +163,8 @@ export default function GroupCard({ group, currentUserId, onGroupChange }: Group
       <CardHeader className="flex flex-row items-center space-x-4 p-4">
         <img src={group.avatar_url || `https://via.placeholder.com/150/33FF57/FFFFFF?text=${group.name.substring(0, 2)}`} alt={group.name} className="w-16 h-16 rounded-full object-cover border-2 border-blue-500" />
         <div className="flex-grow">
-          <CardTitle className="text-xl font-semibold text-gray-900">{group.name}</CardTitle>
-          <p className="text-sm text-gray-500 flex items-center"><FaUsers className="mr-1" /> {group.members_count || 0} membre{((group.members_count || 0) > 1 || (group.members_count || 0) === 0) ? 's' : ''}</p>
+          <CardTitle className="text-xl font-semibold text-foreground">{group.name}</CardTitle>
+          <p className="text-sm text-muted-foreground flex items-center"><FaUsers className="mr-1" /> {group.members_count || 0} membre{((group.members_count || 0) > 1 || (group.members_count || 0) === 0) ? 's' : ''}</p>
         </div>
         {isAdmin && (
           <div className="flex flex-col space-y-2">
@@ -187,12 +187,12 @@ export default function GroupCard({ group, currentUserId, onGroupChange }: Group
         )}
       </CardHeader>
       <CardContent className="p-4 pt-0 flex-grow">
-        <p className="text-gray-700 mb-3 line-clamp-2">{group.description || 'Aucune description.'}</p>
+        <p className="text-muted-foreground mb-3 line-clamp-2">{group.description || 'Aucune description.'}</p>
         {isAdmin && currentInvitationCode && (
-          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-            <p className="text-sm text-gray-600 mb-1">Code d'invitation :</p>
+          <div className="bg-muted p-3 rounded-lg border border-border">
+            <p className="text-sm text-muted-foreground mb-1">Code d'invitation :</p>
             <div className="flex items-center justify-between">
-              <span className="font-mono text-lg tracking-widest text-gray-800">{currentInvitationCode}</span>
+              <span className="font-mono text-lg tracking-widest text-foreground">{currentInvitationCode}</span>
               <div className="flex items-center space-x-2">
                 <Button size="sm" variant="ghost" onClick={handleCopyCode}>Copier</Button>
                 <Button size="sm" variant="outline" onClick={handleRegenerateCode}>Régénérer</Button>
@@ -200,10 +200,10 @@ export default function GroupCard({ group, currentUserId, onGroupChange }: Group
             </div>
           </div>
         )}
-        <p className="text-sm text-gray-600 flex items-center mt-4"><FaBookOpen className="mr-1" /> Lecture actuelle: <span className="font-medium ml-1">Non défini</span></p>
+        <p className="text-sm text-muted-foreground flex items-center mt-4"><FaBookOpen className="mr-1" /> Lecture actuelle: <span className="font-medium ml-1">Non défini</span></p>
       </CardContent>
       <div className="p-4 pt-0 flex space-x-2">
-        <Button className="flex-1 bg-green-500 hover:bg-green-600 text-sm px-3 py-2">Voir le groupe</Button>
+        <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-sm px-3 py-2">Voir le groupe</Button>
         {!isAdmin && (
           <Button
             variant="outline"

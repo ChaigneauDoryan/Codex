@@ -61,7 +61,7 @@ const Toast = React.forwardRef<React.ElementRef<typeof ToastPrimitives.Root>, Re
   return (
     <ToastPrimitives.Root ref={ref} className={cn(toastVariants({ variant }), className)} {...props}>
       {props.children}
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-black/10">
+      <div className="absolute bottom-0 left-0 h-1 w-full bg-foreground/10">
         <div 
           style={{ width: `${progress}%` }}
           className={`h-full ${variant === 'destructive' ? 'bg-red-500' : 'bg-green-500'}`}

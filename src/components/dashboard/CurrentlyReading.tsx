@@ -37,7 +37,7 @@ export function CurrentlyReading({ books }: CurrentlyReadingProps) {
             Vous n'avez aucune lecture en cours pour le moment.
           </p>
           <Link href="/library/add-book">
-            <button className="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">
+            <button className="mt-4 bg-primary text-primary-foreground font-bold py-2 px-4 rounded-md hover:bg-primary/90 transition duration-300">
               Ajouter un livre
             </button>
           </Link>

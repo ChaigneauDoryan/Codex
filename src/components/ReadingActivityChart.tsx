@@ -78,9 +78,9 @@ export default function ReadingActivityChart() {
   return (
     <div>
       <div className="flex justify-end space-x-2 mb-4">
-        <button onClick={() => setPeriod('week')} className={`px-3 py-1 rounded ${period === 'week' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Semaine</button>
-        <button onClick={() => setPeriod('month')} className={`px-3 py-1 rounded ${period === 'month' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Mois</button>
-        <button onClick={() => setPeriod('year')} className={`px-3 py-1 rounded ${period === 'year' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Année</button>
+        <button onClick={() => setPeriod('week')} className={`px-3 py-1 rounded ${period === 'week' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>Semaine</button>
+        <button onClick={() => setPeriod('month')} className={`px-3 py-1 rounded ${period === 'month' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>Mois</button>
+        <button onClick={() => setPeriod('year')} className={`px-3 py-1 rounded ${period === 'year' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>Année</button>
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>

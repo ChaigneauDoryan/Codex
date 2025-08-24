@@ -1,4 +1,6 @@
 
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -19,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createClientComponent } from "@/lib/supabase/client";
 
 import GroupAvatarUpload from "@/components/GroupAvatarUpload";
 
@@ -35,7 +37,7 @@ export default function EditGroupPage() {
   const router = useRouter();
   const params = useParams();
   const groupId = params.groupId as string;
-  const supabase = createClient();
+  const supabase = createClientComponent();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [group, setGroup] = useState<any>(null);

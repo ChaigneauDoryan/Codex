@@ -1,12 +1,15 @@
+
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getUserBookById } from '@/lib/book-utils';
 import BookDetailsClientWrapper from '@/components/BookDetailsClientWrapper';
 
+
+
 interface PageProps {
-  params: Promise<{ userBookId: string }>; // params est maintenant une Promise
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>; // searchParams aussi
+  params: any;
+  searchParams?: any;
 }
 
 export default async function BookDetailPage({ params, searchParams }: PageProps) {

@@ -1,11 +1,18 @@
+
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUserBooks } from "@/lib/book-utils";
+import type { Metadata } from "next";
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { CurrentlyReading, CurrentlyReadingSkeleton } from "@/components/dashboard/CurrentlyReading";
 import { RecentlyFinished, RecentlyFinishedSkeleton } from "@/components/dashboard/RecentlyFinished";
+
+export const metadata: Metadata = {
+  title: "Tableau de bord",
+  description: "Votre espace personnel. Suivez vos lectures en cours, consultez vos livres terminés et gérez votre activité sur Codex.",
+};
 
 // This component fetches and displays the user's currently reading books
 async function CurrentlyReadingData() {

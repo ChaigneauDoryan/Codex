@@ -1,7 +1,7 @@
 'use client';
 
 import { ConfirmModal } from './ui/ConfirmModal';
-import { Book } from '@/app/(dashboard)/library/page';
+import { Book } from '@/app/(dashboard)/library/LibraryClient';
 
 interface ArchiveConfirmModalWrapperProps {
   isOpen: boolean;

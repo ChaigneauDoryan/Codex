@@ -31,6 +31,11 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
+
+
+
+
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState<any>(null);
@@ -206,8 +211,8 @@ export default function ProfilePage() {
     <div className="container mx-auto p-4">
       <div className="space-y-8">
         <header>
-          <h1 className="text-3xl font-bold text-gray-800">Gestion du Profil</h1>
-          <p className="text-gray-600">Mettez à jour vos informations personnelles.</p>
+          <h1 className="text-3xl font-bold text-foreground">Gestion du Profil</h1>
+          <p className="text-muted-foreground">Mettez à jour vos informations personnelles.</p>
         </header>
         <Card>
           <CardHeader>
@@ -216,15 +221,15 @@ export default function ProfilePage() {
           <CardContent className="flex justify-around">
             <div className="text-center">
               <p className="text-2xl font-bold">{stats?.total_books_read || 0}</p>
-              <p className="text-sm text-gray-600">Livres Lus</p>
+              <p className="text-sm text-muted-foreground">Livres Lus</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold">{stats?.total_pages_read || 0}</p>
-              <p className="text-sm text-gray-600">Pages Lues</p>
+              <p className="text-sm text-muted-foreground">Pages Lues</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold">{stats?.average_rating?.toFixed(1) || 'N/A'}</p>
-              <p className="text-sm text-gray-600">Note Moyenne</p>
+              <p className="text-sm text-muted-foreground">Note Moyenne</p>
             </div>
           </CardContent>
         </Card>

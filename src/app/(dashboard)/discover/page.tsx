@@ -1,6 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Découvrir",
+  description: "Explorez de nouveaux livres, trouvez des recommandations et découvrez ce que la communauté Codex est en train de lire.",
+};
+
 export default function DiscoverPage() {
   return (
     <div className="space-y-8">

@@ -1,14 +1,8 @@
-
-'use client'
-
-import { useState, useEffect } from 'react'
-import { Geist, Geist_Mono } from "next/font/google"
-import "./globals.css"
-import { Providers } from "./providers"
-
-import { createClient } from '@/lib/supabase/client'
-import { User } from '@supabase/supabase-js'
-import { Toaster } from '@/components/ui/toaster';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { Providers } from "./providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,48 +14,68 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// IMPORTANT: Remplacez cette URL par l'URL de votre site en production
+const siteUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Codex - Suivez vos lectures, rejoignez des clubs",
+    template: `%s | Codex`,
+  },
+  description: "Codex est une application pour les passionnés de lecture. Suivez votre progression, partagez des résumés, et rejoignez des clubs de lecture pour discuter de vos oeuvres préférées.",
+  openGraph: {
+    title: "Codex - Suivez vos lectures, rejoignez des clubs",
+    description: "Suivez votre progression de lecture, partagez des résumés, et rejoignez des clubs de lecture.",
+    url: siteUrl,
+    siteName: "Codex",
+    images: [
+      {
+        url: "/globe.svg", // Remplacez par une image plus représentative si possible
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Codex - Suivez vos lectures, rejoignez des clubs",
+    description: "Suivez votre progression de lecture, partagez des résumés, et rejoignez des clubs de lecture.",
+    images: ["/globe.svg"], // Remplacez par une image plus représentative
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico", // Pensez à créer des icônes spécifiques pour Apple
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
-    fetchUser();
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (loading) {
-    return (
-      <html lang="fr">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <div className="flex items-center justify-center min-h-screen">Chargement...</div>
-        </body>
-      </html>
-    );
-  }
-
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        </Providers>
         <Toaster />
       </body>
     </html>
