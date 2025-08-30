@@ -1,15 +1,18 @@
-
 'use client';
 
 import { ThemeProvider } from 'next-themes';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  // On instancie un nouveau client simple, sans configuration par défaut.
+  const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
     const {
@@ -29,7 +32,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     fetchUser();
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase.auth]);
 
   if (loading) {
     return (
@@ -40,8 +43,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      {children}
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {children}
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

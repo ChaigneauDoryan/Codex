@@ -1,28 +1,20 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { createClient } from "@/lib/supabase/client"
-import { Textarea } from "@/components/ui/textarea"
-import AvatarUpload from '@/components/AvatarUpload'
-import { useToast } from "@/hooks/use-toast"
-import ReadingActivityChart from '@/components/ReadingActivityChart'
-import BadgeCard from '@/components/BadgeCard'
-import WordCloud from '@/components/WordCloud'
-import PaceDisplay from '@/components/PaceDisplay'
+import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import AvatarUpload from '@/components/AvatarUpload';
+import ReadingActivityChart from '@/components/ReadingActivityChart';
+import BadgeCard from '@/components/BadgeCard';
+import WordCloud from '@/components/WordCloud';
+import PaceDisplay from '@/components/PaceDisplay';
+import { useProfileData, useUpdateProfile } from "@/hooks/use-profile";
 
 const profileFormSchema = z.object({
   username: z.string().min(2, { message: "Le nom d'utilisateur doit contenir au moins 2 caractères." }),
@@ -31,180 +23,42 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-
-
-
-
-
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState<any>(null);
-  const [badges, setBadges] = useState<any[]>([]);
-  const [topGenres, setTopGenres] = useState<any[]>([]);
-  const [topAuthors, setTopAuthors] = useState<any[]>([]);
-  const [readingPace, setReadingPace] = useState<'occasional' | 'regular' | 'passionate' | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [userId, setUserId] = useState<string | null>(null);
-  const supabase = createClient();
+  // Récupération des données via TanStack Query
+  const { data, isLoading, error } = useProfileData();
+  // Récupération de la mutation
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
 
-  const { toast } = useToast();
+  // State local uniquement pour l'URL de l'avatar en cours de modification
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues: {
-      username: "",
-      
-      bio: "",
-    },
+    defaultValues: { username: "", bio: "" },
   });
 
+  // Synchronise les données du serveur avec le formulaire une fois qu'elles sont chargées
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          console.error(error);
-        } else if (data) {
-          setProfile(data);
-          form.reset({
-            username: data.username,
-            bio: data.bio || "",
-          });
-          setAvatarUrl(data.avatar_url || '');
-        }
-
-        // Fetch stats
-        const { data: statsData, error: statsError } = await supabase.rpc('get_user_stats', { p_user_id: user.id });
-        if (statsError) {
-          console.error('Error fetching stats:', statsError);
-        } else {
-          setStats(statsData[0]);
-        }
-
-        // Fetch badges
-        const { data: badgesData, error: badgesError } = await supabase
-          .from('user_badges')
-          .select(`
-            unlocked_at,
-            badges (*)
-          `)
-          .eq('user_id', user.id);
-
-        if (badgesError) {
-          console.error('Error fetching badges:', badgesError);
-        } else {
-          const formattedBadges = badgesData.map((item: any) => ({ ...item.badges, unlocked_at: item.unlocked_at }));
-          setBadges(formattedBadges);
-        }
-
-        // Fetch and calculate reading pace
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const { data: recentBooks, error: paceError } = await supabase
-          .from('user_books')
-          .select('id')
-          .eq('user_id', user.id)
-          .not('finished_at', 'is', null)
-          .gte('finished_at', thirtyDaysAgo.toISOString());
-
-        if (paceError) {
-          console.error('Error fetching reading pace:', paceError);
-        } else {
-          const bookCount = recentBooks?.length || 0;
-          if (bookCount >= 4) {
-            setReadingPace('passionate');
-          } else if (bookCount >= 2) {
-            setReadingPace('regular');
-          } else if (bookCount >= 1) {
-            setReadingPace('occasional');
-          } else {
-            setReadingPace(null);
-          }
-        }
-
-        // Fetch top genres and authors
-        const { data: userBooks, error: userBooksError } = await supabase
-          .from('user_books')
-          .select(`
-            books (
-              genre,
-              author
-            )
-          `)
-          .eq('user_id', user.id)
-          .eq('is_archived', false);
-
-        if (userBooksError) {
-          console.error('Error fetching user books for word cloud:', userBooksError);
-        } else {
-          const genreCounts: { [key: string]: number } = {};
-          const authorCounts: { [key: string]: number } = {};
-
-          userBooks.forEach((item: any) => {
-            if (item.books?.genre) {
-              const genres = item.books.genre.split(',').map((g: string) => g.trim());
-              genres.forEach((genre: string) => {
-                genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-              });
-            }
-            if (item.books?.author) {
-              const authors = item.books.author.split(',').map((a: string) => a.trim());
-              authors.forEach((author: string) => {
-                authorCounts[author] = (authorCounts[author] || 0) + 1;
-              });
-            }
-          });
-
-          const topGenresData = Object.keys(genreCounts)
-            .map(genre => ({ name: genre, count: genreCounts[genre] }))
-            .sort((a, b) => b.count - a.count);
-
-          const topAuthorsData = Object.keys(authorCounts)
-            .map(author => ({ name: author, count: authorCounts[author] }))
-            .sort((a, b) => b.count - a.count);
-
-          setTopGenres(topGenresData);
-          setTopAuthors(topAuthorsData);
-        }
-      }
-      setLoading(false);
-    };
-
-    fetchProfile();
-  }, [form, supabase]);
-
-  async function onSubmit(values: ProfileFormValues) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          username: values.username,
-          bio: values.bio,
-          avatar_url: avatarUrl,
-          updated_at: new Date(),
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error(error);
-        toast({ title: 'Erreur', description: "La mise à jour du profil a échoué.", variant: 'destructive', duration: 5000 });
-      } else {
-        toast({ title: 'Succès', description: "Votre profil a été mis à jour avec succès.", duration: 5000 });
-      }
+    if (data?.profile) {
+      form.reset({
+        username: data.profile.username,
+        bio: data.profile.bio || "",
+      });
+      setAvatarUrl(data.profile.avatar_url || '');
     }
+  }, [data, form]);
+
+  // Gère la soumission du formulaire
+  function onSubmit(values: ProfileFormValues) {
+    updateProfile({ ...values, avatar_url: avatarUrl });
   }
 
-  if (loading) {
-    return <div>Chargement...</div>;
+  if (isLoading) {
+    return <div>Chargement de votre profil...</div>;
+  }
+
+  if (error) {
+    return <div>Erreur: {error.message}</div>;
   }
 
   return (
@@ -214,111 +68,83 @@ export default function ProfilePage() {
           <h1 className="text-3xl font-bold text-foreground">Gestion du Profil</h1>
           <p className="text-muted-foreground">Mettez à jour vos informations personnelles.</p>
         </header>
+
         <Card>
-          <CardHeader>
-            <CardTitle>Vos Statistiques</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Vos Statistiques</CardTitle></CardHeader>
           <CardContent className="flex justify-around">
             <div className="text-center">
-              <p className="text-2xl font-bold">{stats?.total_books_read || 0}</p>
+              <p className="text-2xl font-bold">{data.stats?.total_books_read || 0}</p>
               <p className="text-sm text-muted-foreground">Livres Lus</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold">{stats?.total_pages_read || 0}</p>
+              <p className="text-2xl font-bold">{data.stats?.total_pages_read || 0}</p>
               <p className="text-sm text-muted-foreground">Pages Lues</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold">{stats?.average_rating?.toFixed(1) || 'N/A'}</p>
+              <p className="text-2xl font-bold">{data.stats?.average_rating?.toFixed(1) || 'N/A'}</p>
               <p className="text-sm text-muted-foreground">Note Moyenne</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Activité de Lecture</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ReadingActivityChart />
-          </CardContent>
+          <CardHeader><CardTitle>Activité de Lecture</CardTitle></CardHeader>
+          <CardContent><ReadingActivityChart /></CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Mes Badges</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Mes Badges</CardTitle></CardHeader>
           <CardContent>
-            {badges.length > 0 ? (
+            {data.badges?.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {badges.map(badge => (
-                  <BadgeCard key={badge.id} badge={badge} />
-                ))}
+                {data.badges.map((badge: any) => <BadgeCard key={badge.id} badge={badge} />)}
               </div>
             ) : (
-              <p>Vous n'avez pas encore débloqué de badges. Continuez à lire !</p>
+              <p>Vous n'avez pas encore débloqué de badges.</p>
             )}
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Vos Préférences de Lecture</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Vos Préférences de Lecture</CardTitle></CardHeader>
           <CardContent className="space-y-6">
-            <WordCloud data={topGenres} title="Genres Favoris" />
-            <WordCloud data={topAuthors} title="Auteurs Favoris" />
-            <PaceDisplay pace={readingPace} />
+            <WordCloud data={data.topGenres || []} title="Genres Favoris" />
+            <WordCloud data={data.topAuthors || []} title="Auteurs Favoris" />
+            <PaceDisplay pace={data.readingPace} />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Vos informations</CardTitle>
-          </CardHeader>
+          <CardHeader><CardTitle>Vos informations</CardTitle></CardHeader>
           <CardContent>
-            {userId && (
+            {data.profile?.id && (
               <AvatarUpload
-                userId={userId}
+                userId={data.profile.id}
                 initialAvatarUrl={avatarUrl}
                 onUpload={(url: string) => setAvatarUrl(url)}
               />
             )}
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom d'utilisateur</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Votre pseudo" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="bio"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Biographie</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Parlez-nous un peu de vous..." className="resize-none" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button type="submit">Mettre à jour le profil</Button>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-4">
+                <FormField control={form.control} name="username" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom d'utilisateur</FormLabel>
+                    <FormControl><Input placeholder="Votre pseudo" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="bio" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Biographie</FormLabel>
+                    <FormControl><Textarea placeholder="Parlez-nous un peu de vous..." {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <Button type="submit" disabled={isUpdating}>{isUpdating ? 'Mise à jour...' : 'Mettre à jour le profil'}</Button>
               </form>
             </Form>
           </CardContent>
         </Card>
-
-        
       </div>
     </div>
   );

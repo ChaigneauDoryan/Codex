@@ -1,116 +1,49 @@
 'use client';
 
-import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { FaPlus } from 'react-icons/fa';
 import GroupCard from '@/components/GroupCard';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogClose,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useGroups } from "@/hooks/use-groups";
+import { useJoinGroup } from "@/hooks/use-groups-mutations";
 
 export default function GroupsClient() {
-  const supabase = createClient();
-  const [myGroups, setMyGroups] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  // State local pour l'UI (modale, champ de saisie)
   const [invitationCode, setInvitationCode] = useState('');
-  const [isJoining, setIsJoining] = useState(false);
-  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false); // Nouvel état pour la modale
-  const { toast } = useToast();
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
-  const fetchAndSetGroups = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('group_members')
-      .select(
-        `
-          role,
-          groups (*,
-            group_members(count),
-            invitation_code
-          )
-        `
-      )
-      .eq('user_id', userId);
+  // Data fetching avec TanStack Query
+  const { data: myGroups = [], isLoading, error } = useGroups();
+  
+  // Mutation avec TanStack Query
+  const { mutate: joinGroup, isPending: isJoining } = useJoinGroup();
 
-    if (error) {
-      console.error('Error fetching user groups:', error);
-    } else {
-      const groups = data.map((item: any) => ({
-        ...item.groups,
-        members_count: item.groups.group_members[0]?.count || 0,
-        user_role: item.role,
-      }));
-      setMyGroups(groups);
-    }
+  const handleJoinGroup = () => {
+    joinGroup(invitationCode, {
+      onSuccess: () => {
+        setIsJoinModalOpen(false);
+        setInvitationCode('');
+      }
+    });
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-        await fetchAndSetGroups(user.id);
-      }
-      setLoading(false);
-    };
+  if (isLoading) {
+    return <div>Chargement de vos groupes...</div>;
+  }
 
-    fetchUser();
-  }, [supabase]);
-
-  const handleJoinGroup = async () => {
-    if (!invitationCode) {
-      toast({ title: 'Erreur', description: 'Veuillez saisir un code d\'invitation.', variant: 'destructive' });
-      return;
-    }
-    setIsJoining(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const accessToken = session?.access_token;
-
-      if (!accessToken) {
-        throw new Error('Utilisateur non authentifié.');
-      }
-
-      const response = await fetch('/api/groups/join', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ invitationCode }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Échec pour rejoindre le groupe.');
-      }
-
-      toast({ title: 'Succès', description: 'Vous avez rejoint le groupe !' });
-      setIsJoinModalOpen(false); // Fermer la modale en cas de succès
-      setInvitationCode(''); // Réinitialiser le champ du code
-      if (user) {
-        await fetchAndSetGroups(user.id); // Re-fetch groups
-      }
-    } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
-    } finally {
-      setIsJoining(false);
-    }
-  };
-
-  if (loading) {
-    return <div>Chargement...</div>;
+  if (error) {
+    return <div className="text-red-500">Erreur: {error.message}</div>;
   }
 
   return (
@@ -120,8 +53,8 @@ export default function GroupsClient() {
           <h1 className="text-4xl font-extrabold text-foreground">Vos Groupes de Lecture</h1>
           <p className="text-lg text-muted-foreground mt-2">Connectez-vous avec d'autres passionnés de lecture.</p>
         </div>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full">
-          <Dialog open={isJoinModalOpen} onOpenChange={setIsJoinModalOpen}> {/* Contrôlé par l'état */} 
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+          <Dialog open={isJoinModalOpen} onOpenChange={setIsJoinModalOpen}>
             <DialogTrigger asChild>
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg shadow-md flex items-center">
                 <FaPlus className="mr-2" /> Rejoindre un groupe
@@ -129,7 +62,7 @@ export default function GroupsClient() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Rejoindre un groupe</DialogTitle>
+                <DialogTitle>Rejoindre un groupe par code</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <Input
@@ -139,12 +72,8 @@ export default function GroupsClient() {
                 />
               </div>
               <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Annuler
-                  </Button>
-                </DialogClose>
-                <Button onClick={handleJoinGroup} disabled={isJoining}>
+                <Button type="button" variant="secondary" onClick={() => setIsJoinModalOpen(false)}>Annuler</Button>
+                <Button onClick={handleJoinGroup} disabled={isJoining || !invitationCode}>
                   {isJoining ? 'Rejoindre...' : 'Rejoindre'}
                 </Button>
               </DialogFooter>
@@ -158,13 +87,12 @@ export default function GroupsClient() {
         </div>
       </header>
 
-      {/* Section Mes Groupes */}
       <section>
         <h2 className="text-2xl font-bold text-foreground mb-4">Mes Groupes</h2>
-        {myGroups && myGroups.length > 0 ? (
+        {myGroups.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {myGroups.map((group: any) => (
-              <GroupCard key={group.id} group={group} currentUserId={user?.id || ''} onGroupChange={() => user && fetchAndSetGroups(user.id)} />
+              <GroupCard key={group.id} group={group} />
             ))}
           </div>
         ) : (
@@ -173,7 +101,7 @@ export default function GroupsClient() {
               <CardTitle className="text-foreground">Vous n'êtes dans aucun groupe</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Créez un nouveau groupe ou rejoignez-en un pour commencer à discuter !</p>
+              <p className="text-muted-foreground">Créez ou rejoignez un groupe pour commencer !</p>
               <Link href="/groups/create">
                 <Button variant="secondary" className="mt-4">Créer un groupe</Button>
               </Link>
@@ -182,7 +110,6 @@ export default function GroupsClient() {
         )}
       </section>
 
-      {/* Section Découvrir des Groupes (Placeholder) */}
       <section className="mt-10">
         <h2 className="text-2xl font-bold text-foreground mb-4">Découvrir des Groupes</h2>
         <Card className="border-dashed border-2 border-border p-6 text-center">
@@ -191,7 +118,6 @@ export default function GroupsClient() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Explorez et rejoignez de nouveaux groupes de lecture ici.</p>
-            <Button variant="secondary" className="mt-4">Rechercher des groupes</Button>
           </CardContent>
         </Card>
       </section>

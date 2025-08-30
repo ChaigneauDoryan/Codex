@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { updateUserBookStatus } from '@/lib/book-utils';
 
-export async function PATCH(request: Request, context: any) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient(cookies());
 
   const {
@@ -15,7 +15,7 @@ export async function PATCH(request: Request, context: any) {
   }
 
   const userId = session.user.id;
-  const { userBookId } = context.params;
+  const { id } = await params;
   const { status } = await request.json();
 
   if (!status) {
@@ -23,7 +23,7 @@ export async function PATCH(request: Request, context: any) {
   }
 
   try {
-    const updatedBook = await updateUserBookStatus(supabase, userBookId, status, userId);
+    const updatedBook = await updateUserBookStatus(supabase, id, status, userId);
     return NextResponse.json(updatedBook);
   } catch (error: any) {
     console.error('Error updating user book status:', error.message);

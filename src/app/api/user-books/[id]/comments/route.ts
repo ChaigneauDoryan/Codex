@@ -3,22 +3,15 @@ import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import { getReadingStatusId } from '@/lib/book-utils';
 
-// Interface pour le contexte de la route avec params comme Promise
-interface RouteContext {
-  params: Promise<{ userBookId: string }>;
-}
-
-export async function GET(request: Request, context: RouteContext) {
-  const { userBookId } = await context.params;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: userBookId } = await params;
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
   try {
@@ -30,34 +23,32 @@ export async function GET(request: Request, context: RouteContext) {
 
     if (error) {
       console.error('Error fetching comments:', error);
-      return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
+      return new Response(JSON.stringify({ error: 'Failed to fetch comments' }), { status: 500 });
     }
 
     return NextResponse.json(comments);
   } catch (error) {
     console.error('Unexpected error fetching comments:', error);
-    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    return new Response(JSON.stringify({ error: 'An unexpected error occurred' }), { status: 500 });
   }
 }
 
-export async function POST(request: Request, context: RouteContext) {
-  const { userBookId } = await context.params;
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: userBookId } = await params;
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
   try {
     const { page_number, comment_title, comment_text } = await request.json();
 
     if (!page_number || !comment_title || !comment_text) {
-      return NextResponse.json({ error: 'Missing required fields: page_number, comment_title, comment_text' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'Missing required fields: page_number, comment_title, comment_text' }), { status: 400 });
     }
 
     // Check if this is the first comment for this user_book_id
@@ -89,7 +80,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     if (commentError) {
       console.error('Error inserting comment:', commentError);
-      return NextResponse.json({ error: 'Failed to add comment' }, { status: 500 });
+      return new Response(JSON.stringify({ error: 'Failed to add comment' }), { status: 500 });
     }
 
     let updateData: any = {
@@ -117,6 +108,6 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
     console.error('Unexpected error adding comment:', error);
-    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
+    return new Response(JSON.stringify({ error: 'An unexpected error occurred' }), { status: 500 });
   }
 }

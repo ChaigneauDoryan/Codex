@@ -1,113 +1,61 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
-
-interface Comment {
-  id: string;
-  page_number: number;
-  comment_text: string;
-  created_at: string;
-  updated_at: string;
-  comment_title: string;
-}
+import { useUserBookComments } from '@/hooks/use-user-book';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface BookCommentTimelineProps {
-  userBookId: string;
+  id: string;
   totalBookPages: number;
-  refreshKey: number; // New prop
 }
 
-export default function BookCommentTimeline({ userBookId, totalBookPages, refreshKey }: BookCommentTimelineProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
-  const supabase = createClient(); // Client-side Supabase client
+export default function BookCommentTimeline({ id, totalBookPages }: BookCommentTimelineProps) {
+  const { data: comments = [], isLoading, error } = useUserBookComments(id);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data: { session }, } = await supabase.auth.getSession();
+  if (isLoading) return <p>Chargement des commentaires...</p>;
+  if (error) return <p className="text-red-500">Erreur: {error.message}</p>;
 
-        if (!session || !session.access_token) { // Check for session and access_token
-          setError("Utilisateur non authentifié ou session expirée.");
-          setLoading(false);
-          return;
-        }
-        const accessToken = session.access_token;
-
-        const response = await fetch(`/api/user-books/${userBookId}/comments`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setComments(data);
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComments();
-  }, [userBookId, supabase, refreshKey]);
-
-  if (loading) {
-    return <p>Chargement des commentaires...</p>;
-  }
-
-  if (error) {
-    return <p className="text-red-500">Erreur lors du chargement des commentaires : {error}</p>;
-  }
+  const sortedComments = [...comments].sort((a, b) => {
+    const pageA = a.page_number ?? Infinity;
+    const pageB = b.page_number ?? Infinity;
+    if (pageA !== pageB) {
+      return pageA - pageB;
+    }
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 
   return (
-    <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-4">Timeline des commentaires</h2>
-      <div className="relative w-full h-2 bg-gray-200 rounded-full mb-8 flex items-center"> {/* Reduced height */}
-        {/* Timeline bar */}
-        {comments.map((comment) => {
-          const position = (comment.page_number / totalBookPages) * 100;
-          return (
-            <div
-              key={comment.id}
-              className="absolute flex flex-col items-center cursor-pointer"
-              style={{ left: `${position}%`, transform: 'translateX(-50%)' }}
-              onClick={() => setSelectedComment(comment)}
-            >
-              {/* Line connecting to the title */}
-              <div className="w-4 h-4 bg-blue-500 rounded-full relative z-10"></div> {/* The point */}
-              {/* Line connecting to the title */}
-              <div className="absolute w-px bg-gray-400" style={{ height: '20px', top: '100%', marginTop: '4px' }}></div> {/* Line below the point */}
-              <span className="absolute text-xs text-gray-700 whitespace-nowrap" style={{ top: 'calc(100% + 24px)' }}>{comment.comment_title}</span> {/* Title below the line */}
-            </div>
-          );
-        })}
-      </div>
-
-      {selectedComment && (
-        <Card className="mt-4">
-          <CardContent className="pt-4">
-            <h3 className="font-semibold text-lg mb-2">{selectedComment.comment_title} (Page {selectedComment.page_number})</h3>
-            <p className="text-gray-700">{selectedComment.comment_text}</p>
-            <p className="text-xs text-gray-500 mt-2">Créé le : {new Date(selectedComment.created_at).toLocaleDateString()}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {comments.length === 0 && (
-        <p>Aucun commentaire pour ce livre.</p>
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Fil des Commentaires</CardTitle>
+        <CardDescription>Vos pensées et réactions au fil de votre lecture.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {sortedComments.length === 0 ? (
+          <p>Aucun commentaire pour l'instant.</p>
+        ) : (
+          <div className="relative border-l-2 border-gray-200 dark:border-gray-700 ml-4">
+            {sortedComments.map((comment, index) => (
+              <div key={index} className="mb-8 ml-8">
+                {comment.page_number && (
+                  <span className="absolute -left-4 flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
+                    <p className="text-sm font-bold text-blue-800 dark:text-blue-300">{comment.page_number}</p>
+                  </span>
+                )}
+                {!comment.page_number && (
+                   <span className="absolute -left-4 flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full ring-8 ring-white dark:ring-gray-900 dark:bg-gray-700">
+                   </span>
+                )}
+                <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-600">
+                    <p className="text-gray-700 dark:text-gray-300">{comment.comment}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      {new Date(comment.created_at).toLocaleDateString()}
+                    </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -1,73 +1,69 @@
-
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getUserBooks } from "@/lib/book-utils";
 import type { Metadata } from "next";
-
+import { DashboardClient } from "./DashboardClient";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { CurrentlyReading, CurrentlyReadingSkeleton } from "@/components/dashboard/CurrentlyReading";
-import { RecentlyFinished, RecentlyFinishedSkeleton } from "@/components/dashboard/RecentlyFinished";
+import { CurrentlyReadingSkeleton } from "@/components/dashboard/CurrentlyReading";
 
 export const metadata: Metadata = {
   title: "Tableau de bord",
   description: "Votre espace personnel. Suivez vos lectures en cours, consultez vos livres terminés et gérez votre activité sur Codex.",
 };
 
-// This component fetches and displays the user's currently reading books
-async function CurrentlyReadingData() {
+// Fonction pour récupérer les données initiales côté serveur
+async function getInitialDashboardData() {
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return <CurrentlyReading books={[]} />;
+  if (!user) {
+    return {
+      username: 'lecteur',
+      currentlyReading: [],
+      recentlyFinished: [],
+    };
+  }
 
-  // Assuming 'En cours' is the status name for reading. Adjust if necessary.
-  const currentlyReadingBooks = await getUserBooks(supabase, user.id, 2, false);
-  return <CurrentlyReading books={currentlyReadingBooks || []} />;
-}
-
-// This component fetches and displays the user's recently finished books
-async function RecentlyFinishedData() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) return <RecentlyFinished books={[]} />;
-
-  // Fetch by status ID 3 for 'finished'
-  const recentlyFinishedBooks = await getUserBooks(supabase, user.id, 3, false);
-  
-  // Sort by finished_at date and take the latest 4
-  const sortedBooks = (recentlyFinishedBooks || []).sort((a: any, b: any) => 
-    new Date(b.finished_at).getTime() - new Date(a.finished_at).getTime()
-  ).slice(0, 4);
-
-  return <RecentlyFinished books={sortedBooks} />;
-}
-
-export default async function DashboardPage() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
-
-  const { data: { user } } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from("profiles")
     .select("username")
-    .eq("id", user?.id)
+    .eq("id", user.id)
     .single();
 
+  const currentlyReadingBooks = await getUserBooks(supabase, user.id, 2, false);
+  const finishedBooks = await getUserBooks(supabase, user.id, 3, false);
+  const recentlyFinishedBooks = (finishedBooks || []).sort((a: any, b: any) => 
+      new Date(b.finished_at).getTime() - new Date(a.finished_at).getTime()
+    ).slice(0, 4);
+
+  return {
+    username: profile?.username || 'lecteur',
+    currentlyReading: currentlyReadingBooks || [],
+    recentlyFinished: recentlyFinishedBooks || [],
+  };
+}
+
+export default async function DashboardPage() {
+  // On récupère les données sur le serveur au premier chargement
+  const initialData = await getInitialDashboardData();
+
+  return (
+    // Suspense permet d'afficher un fallback pendant que le composant serveur initial charge.
+    // Le client prendra ensuite le relais.
+    <Suspense fallback={<DashboardFallback />}>
+      <DashboardClient initialData={initialData} />
+    </Suspense>
+  );
+}
+
+// Fallback pour le chargement initial
+function DashboardFallback() {
   return (
     <div className="space-y-8">
-      <DashboardHeader username={profile?.username || 'lecteur'} />
-
-      <Suspense fallback={<CurrentlyReadingSkeleton />}>
-        <CurrentlyReadingData />
-      </Suspense>
-
-      <Suspense fallback={<RecentlyFinishedSkeleton />}>
-        <RecentlyFinishedData />
-      </Suspense>
+      <DashboardHeader username="..." />
+      <CurrentlyReadingSkeleton />
     </div>
   );
 }

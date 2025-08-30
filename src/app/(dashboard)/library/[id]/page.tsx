@@ -13,8 +13,7 @@ interface PageProps {
 }
 
 export default async function BookDetailPage({ params, searchParams }: PageProps) {
-  // Attendre la résolution de params
-  const { userBookId } = await params;
+  const { id } = params;
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
 
@@ -31,7 +30,7 @@ export default async function BookDetailPage({ params, searchParams }: PageProps
   let userBook: any = null;
 
   try {
-    userBook = await getUserBookById(supabase, userBookId, userId);
+    userBook = await getUserBookById(supabase, id, userId);
     if (!userBook) {
       notFound();
     }
@@ -42,7 +41,7 @@ export default async function BookDetailPage({ params, searchParams }: PageProps
 
   return (
     <div className="container mx-auto py-8">
-      <BookDetailsClientWrapper userBookId={userBookId} userBook={userBook} />
+      <BookDetailsClientWrapper userBookId={id} userBook={userBook} />
     </div>
   );
 }
