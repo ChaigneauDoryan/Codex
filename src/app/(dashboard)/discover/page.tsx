@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 export default function DiscoverPage() {
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto p-4 md:p-8 space-y-8">
       <header>
-        <h1 className="text-3xl font-bold text-gray-800">Découvrir</h1>
-        <p className="text-gray-600">Explorez de nouveaux genres et trouvez votre prochaine lecture.</p>
+        <h1 className="text-3xl font-bold text-foreground">Découvrir</h1>
+        <p className="text-muted-foreground">Explorez de nouveaux genres et trouvez votre prochaine lecture.</p>
       </header>
       <Card>
         <CardHeader>

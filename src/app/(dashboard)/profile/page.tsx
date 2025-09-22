@@ -62,7 +62,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 md:p-8">
       <div className="space-y-8">
         <header>
           <h1 className="text-3xl font-bold text-foreground">Gestion du Profil</h1>

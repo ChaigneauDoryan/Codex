@@ -29,11 +29,11 @@ export function CurrentlyReading({ books }: CurrentlyReadingProps) {
   if (!books || books.length === 0) {
     return (
       <div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        <h2 className="text-2xl font-semibold text-foreground mb-4">
           Mes Lectures en Cours
         </h2>
         <div className="text-center py-10 px-6 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Vous n'avez aucune lecture en cours pour le moment.
           </p>
           <Link href="/library/add-book">
@@ -48,7 +48,7 @@ export function CurrentlyReading({ books }: CurrentlyReadingProps) {
 
   return (
     <section>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+      <h2 className="text-2xl font-semibold text-foreground mb-4">
         Mes Lectures en Cours
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -79,7 +79,7 @@ export function CurrentlyReading({ books }: CurrentlyReadingProps) {
                       ) : null}
                     </div>
                     <div className="w-2/3">
-                      <p className="text-sm text-gray-500 mb-2 truncate">
+                      <p className="text-sm text-muted-foreground mb-2 truncate">
                         {bookData.author}
                       </p>
                       <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -88,7 +88,7 @@ export function CurrentlyReading({ books }: CurrentlyReadingProps) {
                           style={{ width: `${progress}%` }}
                         ></div>
                       </div>
-                      <p className="text-right text-sm text-gray-600 mt-1">
+                      <p className="text-right text-sm text-muted-foreground mt-1">
                         {progress}%
                       </p>
                     </div>
@@ -106,7 +106,7 @@ export function CurrentlyReading({ books }: CurrentlyReadingProps) {
 export function CurrentlyReadingSkeleton() {
   return (
     <section>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4 h-8 w-1/3 bg-gray-200 rounded animate-pulse"></h2>
+      <h2 className="text-2xl font-semibold text-foreground mb-4 h-8 w-1/3 bg-muted rounded animate-pulse"></h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(3)].map((_, i) => (
           <Card key={i}>

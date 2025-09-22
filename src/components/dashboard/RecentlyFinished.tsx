@@ -35,7 +35,7 @@ export function RecentlyFinished({ books }: RecentlyFinishedProps) {
 
   return (
     <section>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Derniers Livres Terminés</h2>
+      <h2 className="text-2xl font-semibold text-foreground mb-4">Derniers Livres Terminés</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {books.map((userBook) => {
           // Récupérer le premier livre de l'array
@@ -60,14 +60,14 @@ export function RecentlyFinished({ books }: RecentlyFinishedProps) {
                       />
                     ) : null}
                   <p className="font-semibold text-md flex-grow truncate w-full">{bookData.title}</p>
-                  <p className="text-sm text-gray-500 truncate w-full">{bookData.author}</p>
+                  <p className="text-sm text-muted-foreground truncate w-full">{bookData.author}</p>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
                   </div>
-                  <p className="text-right text-sm text-gray-600 mt-1">
+                  <p className="text-right text-sm text-muted-foreground mt-1">
                     {progress}%
                   </p>
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Terminé le {userBook.finished_at ? format(new Date(userBook.finished_at), 'd MMMM yyyy', { locale: fr }) : "inconnu"}
                   </p>
                 </CardContent>
@@ -83,7 +83,7 @@ export function RecentlyFinished({ books }: RecentlyFinishedProps) {
 export function RecentlyFinishedSkeleton() {
     return (
       <section>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4 h-8 w-1/3 bg-gray-200 rounded animate-pulse"></h2>
+        <h2 className="text-2xl font-semibold text-foreground mb-4 h-8 w-1/3 bg-muted rounded animate-pulse"></h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="h-full flex flex-col">

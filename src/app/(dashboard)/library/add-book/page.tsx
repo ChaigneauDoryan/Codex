@@ -393,7 +393,7 @@ export default function AddBookPage() {
                 <CardHeader>
                   <CardTitle>{book.volumeInfo.title}</CardTitle>
                   {book.volumeInfo.authors && (
-                    <p className="text-sm text-gray-500">par {book.volumeInfo.authors.join(', ')}</p>
+                    <p className="text-sm text-muted-foreground">par {book.volumeInfo.authors.join(', ')}</p>
                   )}
                 </CardHeader>
                 <CardContent className="flex-grow">
@@ -434,7 +434,7 @@ export default function AddBookPage() {
 
       {(results.length === 0 && (searchParams.title || searchParams.author || searchParams.isbn || searchParams.genre) && !loading && !showManualForm) && (
         <div className="text-center mb-6">
-          <p className="text-gray-600">Aucun résultat trouvé pour votre recherche.</p>
+          <p className="text-muted-foreground">Aucun résultat trouvé pour votre recherche.</p>
           <Button variant="outline" onClick={() => setShowManualForm(true)} className="mt-4">Ajouter manuellement</Button>
         </div>
       )}

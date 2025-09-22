@@ -119,11 +119,14 @@ export default function LibraryClient() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Ma Bibliothèque</h1>
+    <div className="container mx-auto p-4 md:p-8">
+      <header className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Ma Bibliothèque</h1>
+          <p className="text-muted-foreground">Gérez votre collection de livres, suivez vos lectures et découvrez de nouvelles aventures.</p>
+        </div>
         <Link href="/library/add-book"><Button>Ajouter un Nouveau Livre</Button></Link>
-      </div>
+      </header>
 
       <div className="mb-6 flex space-x-4">
         <Select onValueChange={setFilterStatus} defaultValue={filterStatus}>
@@ -149,7 +152,7 @@ export default function LibraryClient() {
       {isLoading && <p>Chargement de votre bibliothèque...</p>}
       {error && <p className="text-red-500">Erreur : {error.message}</p>}
       {!isLoading && !error && books.length === 0 && (
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-muted-foreground">
           {filterStatus === 'all' && filterArchiveStatus === 'non_archived'
             ? 'Votre bibliothèque est vide. Ajoutez votre premier livre !'
             : 'Aucun livre ne correspond à vos filtres.'}

@@ -41,7 +41,7 @@ export default function PaceSlider({ initialPace, onPaceChange }: PaceSliderProp
         value={[level]}
         onValueChange={handleValueChange}
       />
-      <div className="flex justify-between text-center mt-2 text-sm text-gray-600">
+      <div className="flex justify-between text-center mt-2 text-sm text-muted-foreground">
         <span>{PACE_LEVELS.occasional.label}</span>
         <span>{PACE_LEVELS.regular.label}</span>
         <span>{PACE_LEVELS.passionate.label}</span>

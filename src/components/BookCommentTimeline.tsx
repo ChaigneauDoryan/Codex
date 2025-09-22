@@ -46,8 +46,8 @@ export default function BookCommentTimeline({ id, totalBookPages }: BookCommentT
                    </span>
                 )}
                 <div className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-600">
-                    <p className="text-gray-700 dark:text-gray-300">{comment.comment}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    <p className="text-foreground">{comment.comment}</p>
+                    <p className="text-xs text-muted-foreground mt-2">
                       {new Date(comment.created_at).toLocaleDateString()}
                     </p>
                 </div>

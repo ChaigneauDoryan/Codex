@@ -191,7 +191,11 @@ export default function SignupForm() {
           </Form>
           <div className="mt-4 text-center flex flex-col space-y-2">
             <Button type="submit" className="w-full">S'inscrire</Button>
-            <p className="text-sm text-gray-600">Ou continuer avec</p>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Ou continuer avec
+              </span>
+            </div>
             <Button onClick={handleGoogleSignIn} variant="outline" className="w-full">S'inscrire avec Google</Button>
           </div>
         </CardContent>

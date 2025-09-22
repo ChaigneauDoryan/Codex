@@ -22,7 +22,7 @@ export function DashboardClient({ initialData }: DashboardClientProps) {
   const displayData = data || initialData;
 
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto p-4 md:p-8 space-y-8">
       <DashboardHeader username={displayData.username} />
       <CurrentlyReading books={displayData.currentlyReading} />
       <RecentlyFinished books={displayData.recentlyFinished} />

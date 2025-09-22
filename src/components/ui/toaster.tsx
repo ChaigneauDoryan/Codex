@@ -32,7 +32,7 @@ export function Toaster() {
           <Toast key={id} {...props} duration={duration}>
             {IconComponent && (
               <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 mr-3">
-                {React.createElement(IconComponent, { className: 'h-5 w-5 text-gray-600' })}
+                {React.createElement(IconComponent, { className: 'h-5 w-5 text-muted-foreground' })}
               </div>
             )}
             <div className="grid gap-1">

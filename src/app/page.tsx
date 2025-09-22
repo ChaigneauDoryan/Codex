@@ -115,7 +115,7 @@ export default function HomePage() {
           <div className="flex justify-center space-x-6 mb-6">
             {/* Add social media links here */}
           </div>
-          <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} Codex. Tous droits réservés.</p>
+          <p className="text-muted-foreground text-sm">&copy; {new Date().getFullYear()} Codex. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

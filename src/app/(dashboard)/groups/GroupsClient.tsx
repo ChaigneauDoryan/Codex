@@ -47,10 +47,10 @@ export default function GroupsClient() {
   }
 
   return (
-    <div className="space-y-8 p-4">
+    <div className="container mx-auto p-4 md:p-8 space-y-8">
       <header className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-4xl font-extrabold text-foreground">Vos Groupes de Lecture</h1>
+          <h1 className="text-3xl font-bold text-foreground">Vos Groupes de Lecture</h1>
           <p className="text-lg text-muted-foreground mt-2">Connectez-vous avec d'autres passionnés de lecture.</p>
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">

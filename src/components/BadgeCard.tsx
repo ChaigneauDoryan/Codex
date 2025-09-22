@@ -36,12 +36,12 @@ export default function BadgeCard({ badge }: BadgeCardProps) {
         <TooltipTrigger asChild>
           <div className="flex flex-col items-center justify-center p-4 border rounded-lg bg-gray-50 text-center space-y-2 transition-transform hover:scale-105">
             <IconComponent className="w-10 h-10 text-yellow-500" />
-            <p className="font-semibold text-gray-800">{badge.name}</p>
+            <p className="font-semibold text-foreground">{badge.name}</p>
           </div>
         </TooltipTrigger>
         <TooltipContent>
           <p className="font-bold">{badge.description}</p>
-          <p className="text-sm text-gray-500">Débloqué le {unlockedDate}</p>
+          <p className="text-sm text-muted-foreground">Débloqué le {unlockedDate}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

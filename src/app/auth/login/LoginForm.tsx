@@ -112,7 +112,7 @@ export default function LoginForm() {
             </form>
           </Form>
           <div className="mt-4 text-center flex flex-col space-y-2">
-            <p className="text-sm text-gray-600">Ou continuer avec</p>
+            <p className="text-sm text-muted-foreground">Ou continuer avec</p>
             <Button onClick={handleGoogleSignIn} variant="outline" className="w-full">Se connecter avec Google</Button>
           </div>
         </CardContent>

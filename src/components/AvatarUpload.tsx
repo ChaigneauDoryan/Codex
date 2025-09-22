@@ -136,7 +136,7 @@ export default function AvatarUpload({ userId, initialAvatarUrl, onUpload }: Ava
         className="w-32 h-32 rounded-full object-cover bg-gray-200"
       />
       <div>
-        <label htmlFor="avatar-upload" className="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">
+        <label htmlFor="avatar-upload" className="cursor-pointer bg-muted hover:bg-muted/80 text-muted-foreground font-bold py-2 px-4 rounded-lg">
           {uploading ? 'Chargement...' : 'Changer l\'avatar'}
         </label>
         <input

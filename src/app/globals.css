@@ -42,12 +42,12 @@
 
   .dark {
     /* Arrière-plan principal légèrement moins sombre */
-    --background: 220 20% 8%;
-    --foreground: 220 15% 90%;
+    --background: 220 20% 10%;
+    --foreground: 220 15% 80%;
 
     /* Cards avec un contraste amélioré */
-    --card: 220 20% 12%;
-    --card-foreground: 220 12% 88%;
+    --card: 220 20% 14%;
+    --card-foreground: 220 12% 78%;
 
     /* Popovers avec un contraste amélioré */
     --popover: 220 25% 10%;

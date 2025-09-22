@@ -50,7 +50,7 @@ export default function WordCloud({ data, title }: WordCloudProps) {
     return (
       <div>
         <h3 className="font-semibold mb-2">{title}</h3>
-        <p className="text-sm text-gray-500">Pas encore de données.</p>
+        <p className="text-sm text-muted-foreground">Pas encore de données.</p>
       </div>
     );
   }
@@ -63,7 +63,7 @@ export default function WordCloud({ data, title }: WordCloudProps) {
           <span 
             key={`${item.name}-${index}`}
             style={wordStyles[`${item.name}-${index}`]}
-            className="font-bold text-gray-700 hover:text-blue-600 transition-all duration-300 ease-in-out hover:scale-110"
+            className="font-bold text-foreground hover:text-blue-600 transition-all duration-300 ease-in-out hover:scale-110"
           >
             {item.name}
           </span>

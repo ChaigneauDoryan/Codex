@@ -10,8 +10,8 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-bold text-gray-800">Mes Avis</h1>
-        <p className="text-gray-600">Retrouvez tous les avis que vous avez partagés.</p>
+        <h1 className="text-3xl font-bold text-foreground">Mes Avis</h1>
+        <p className="text-muted-foreground">Retrouvez tous les avis que vous avez partagés.</p>
       </header>
       <Card>
         <CardHeader>

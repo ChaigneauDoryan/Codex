@@ -26,9 +26,9 @@ export default function ClientLayoutContent({
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-background">
       <TopNavbar user={user} profile={profile} onSignOut={handleSignOut} />
-            <main className="flex-1 p-4 md:p-8 bg-gray-100/50">
+      <main className="flex-1 bg-gray-100/50">
         {children}
       </main>
     </div>

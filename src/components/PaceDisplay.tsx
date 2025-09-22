@@ -19,7 +19,7 @@ export default function PaceDisplay({ pace }: PaceDisplayProps) {
     return (
       <div>
         <h3 className="font-semibold mb-2">Rythme de Lecture</h3>
-        <p className="text-sm text-gray-500">Pas encore de données.</p>
+        <p className="text-sm text-muted-foreground">Pas encore de données.</p>
       </div>
     );
   }
@@ -33,7 +33,7 @@ export default function PaceDisplay({ pace }: PaceDisplayProps) {
         <Icon className={`w-10 h-10 ${color}`} />
         <div>
           <p className={`text-xl font-bold ${color}`}>{label}</p>
-          <p className="text-sm text-gray-600">Basé sur votre activité des 30 derniers jours.</p>
+          <p className="text-sm text-muted-foreground">Basé sur votre activité des 30 derniers jours.</p>
         </div>
       </div>
     </div>

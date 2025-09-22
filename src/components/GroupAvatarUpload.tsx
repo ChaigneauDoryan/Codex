@@ -60,11 +60,11 @@ export default function GroupAvatarUpload({ onUpload, existingAvatarUrl }: Group
         {avatarUrl ? (
           <img src={avatarUrl} alt="Avatar du groupe" className="w-full h-full object-cover" />
         ) : (
-          <span className="text-gray-500">Avatar</span>
+          <span className="text-muted-foreground">Avatar</span>
         )}
       </div>
       <div>
-        <label htmlFor="group-avatar-upload" className="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg inline-flex items-center">
+        <label htmlFor="group-avatar-upload" className="cursor-pointer bg-muted hover:bg-muted/80 text-muted-foreground font-bold py-2 px-4 rounded-lg inline-flex items-center">
           {uploading ? <FaSpinner className="animate-spin mr-2" /> : <FaUpload className="mr-2" />}
           <span>{uploading ? 'Chargement...' : 'Choisir une image'}</span>
         </label>
